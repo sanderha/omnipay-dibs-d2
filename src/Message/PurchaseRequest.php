@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\Fasapay\Message;
+namespace Omnipay\DibsD2\Message;
 
 use Omnipay\Common\Message\AbstractRequest;
 
@@ -9,134 +9,76 @@ use Omnipay\Common\Message\AbstractRequest;
  */
 class PurchaseRequest extends AbstractRequest
 {
-    public $liveEndpoint = 'https://sci.fasapay.com/';
+    public $endpoint = 'https://payment.architrade.com/paymentweb/start.action';
 
-    public $sandboxEndpoint = 'https://sandbox.fasapay.com/sci/';
 
     public function getData()
     {
-        $data = array(
-            'fp_acc' => $this->getParameter('accountTo'),
-            'fp_acc_from' => $this->getParameter('accountFrom'),
-            'fp_store' => $this->getParameter('store'),
-            'fp_item"' => $this->getParameter('item'),
-            'fp_amnt' => $this->getAmount(),
-            'fp_currency' => $this->getCurrency(),
-            'fp_fee_mode' => $this->getParameter('feeMode'),
-            'fp_success_url' => $this->getReturnUrl(),
-            'fp_success_method' => $this->getParameter('successMethod'),
-            'fp_fail_url' => $this->getCancelUrl(),
-            'fp_fail_method' => $this->getParameter('failMethod'),
-            'fp_status_url' => $this->getNotifyUrl(),
-            'fp_status_method' => $this->getParameter('statusMethod'),
-            'fp_comments' => $this->getParameter('comments'),
-            'fp_merchant_ref' => $this->getTransactionId(),
-        );
+        $data = [
+            'accepturl' => $this->getParameter('accepturl'),
+            'amount' => $this->getParameter('amount'),
+            'callbackurl' => $this->getParameter('callbackurl'),
+            'currency' => $this->getParameter('currency'),
+            'merchant' => $this->getParameter('merchant'),
+            'orderid' => $this->getParameter('orderid'),
+            'billingAddress' => $this->getParameter('billingAddress'),
+            'billingAddress2' => $this->getParameter('billingAddress2'),
+            'billingFirstName' => $this->getParameter('billingFirstName'),
+            'billingLastName' => $this->getParameter('billingLastName'),
+            'billingPostalCode' => $this->getParameter('billingPostalCode'),
+            'billingPostalPlace' => $this->getParameter('billingPostalPlace'),
+            'cardholder_name' => $this->getParameter('cardholder_name'),
+            'cardholder_address1' => $this->getParameter('cardholder_address1'),
+            'cardholder_zipcode' => $this->getParameter('cardholder_zipcode'),
+            'email' => $this->getParameter('email'),
+            'md5key' => $this->getParameter('md5key'),
+            'acquirerinfo' => $this->getParameter('acquirerinfo'),
+            'account' => $this->getParameter('account'),
+            'acquirerlang' => $this->getParameter('acquirerlang'),
+            'calcfee' => $this->getParameter('calcfee'),
+            'cancelurl' => $this->getParameter('cancelurl'),
+            'capturenow' => $this->getParameter('capturenow'),
+            'decorator' => $this->getParameter('decorator'),
+            'HTTP_COOKIE' => $this->getParameter('http_cookie'),
+            'ip' => $this->getParameter('ip'),
+            'lang' => $this->getParameter('lang'),
+            'maketicket' => $this->getParameter('maketicket'),
+            'notifyurl' => $this->getParameter('notifyurl'),
+            'ordertext' => $this->getParameter('ordertext'),
+            'paytype' => $this->getParameter('paytype'),
+            'postype' => $this->getParameter('postype'),
+            'preauth' => $this->getParameter('preauth'),
+            'return_checksum' => $this->getParameter('return_checksum'),
+            'test' => $this->getTestMode() ? 'true' : null,
+            'ticketrule' => $this->getParameter('ticketrule'),
+            'uniqueoid' => $this->getParameter('uniqueoid'),
+            'voucher' => $this->getParameter('voucher'),
+        ];
 
-        return $data;
+        if (is_array($this->getParameter('deliveries'))) {
+            foreach ($this->getParameter('deliveries') as $key => $delivery) {
+                foreach ($delivery as $dkey => $value) {
+                    $data['delivery' . ($key + 1) . '.' . $dkey] = $value;
+                }
+            }
+        }
+
+        return array_filter($data);
     }
 
     public function sendData($data)
     {
-        return new PurchaseResponse($this, $data, $this->getEndpoint());
+        return new PurchaseResponse($this, $data, $this->endpoint);
     }
 
-    // Getters
-
-    public function getEndpoint()
-    {
-        return ((bool)$this->getTestMode()) ? $this->sandboxEndpoint : $this->liveEndpoint;
-    }
-
-    public function getAccountTo()
-    {
-        return $this->getParameter('accountTo');
-    }
-
-    public function getAccountFrom()
-    {
-        return $this->getParameter('accountFrom');
-    }
-
-    public function getStore()
-    {
-        return $this->getParameter('store');
-    }
-
-    public function getItem()
-    {
-        return $this->getParameter('item');
-    }
-
-    public function getFeeMode()
-    {
-        return $this->getParameter('feeMode');
-    }
-
-    public function getSuccessMethod()
-    {
-        return $this->getParameter('successMethod');
-    }
-
-    public function getFailMethod()
-    {
-        return $this->getParameter('failMethod');
-    }
-
-    public function getStatusMethod()
-    {
-        return $this->getParameter('statusMethod');
-    }
-
-    public function getComments()
-    {
-        return $this->getParameter('comments');
-    }
-
-    // Setters
-
-    public function setAccountTo($value)
-    {
-        return $this->setParameter('accountTo', $value);
-    }
-
-    public function setAccountFrom($value)
-    {
-        return $this->setParameter('accountFrom', $value);
-    }
-
-    public function setStore($value)
-    {
-        return $this->setParameter('store', $value);
-    }
-
-    public function setItem($value)
-    {
-        return $this->setParameter('item', $value);
-    }
-
-    public function setFeeMode($value)
-    {
-        return $this->setParameter('feeMode', $value);
-    }
-
-    public function setSuccessMethod($value)
-    {
-        return $this->setParameter('successMethod', $value);
-    }
-
-    public function setFailMethod($value)
-    {
-        return $this->setParameter('failMethod', $value);
-    }
-
-    public function setStatusMethod($value)
-    {
-        return $this->setParameter('statusMethod', $value);
-    }
-
-    public function setComments($value)
-    {
-        return $this->setParameter('comments', $value);
+    // Getters and setters
+    public function __call($method, $params) {
+        if (substr($method,0,3) == 'get') {
+            return $this->getParameter(lcfirst(substr($method,3)));
+        } else if (substr($method,0,3) == 'set') {
+            $this->setParameter(lcfirst(substr($method,3)), $params[0]);
+        } else {
+            return null;
+        }
     }
 }

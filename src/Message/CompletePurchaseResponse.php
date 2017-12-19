@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\Fasapay\Message;
+namespace Omnipay\DibsD2\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 
@@ -16,6 +16,6 @@ class CompletePurchaseResponse extends AbstractResponse
 
     public function getTransactionReference()
     {
-        return isset($this->data['fp_batchnumber']) ? $this->data['fp_batchnumber'] : null;
+        return isset($this->data['orderid']) ? $this->data['orderid'] : null;
     }
 }

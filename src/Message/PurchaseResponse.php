@@ -1,6 +1,6 @@
 <?php
 
-namespace Omnipay\Fasapay\Message;
+namespace Omnipay\DibsD2\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;

@@ -1,9 +1,10 @@
 {
-    "name": "andreas22/omnipay-fasapay",
+    "name": "Addgod/omnipay-dibs-d2",
     "type": "library",
-    "description": "Fasapay driver for the Omnipay payment processing library",
+    "description": "Dibs D2 driver for the Omnipay payment processing library",
     "keywords": [
-        "fasapay",
+        "dibs",
+        "dubs d2",
         "gateway",
         "merchant",
         "omnipay",
@@ -11,16 +12,16 @@
         "payment",
         "transfer"
     ],
-    "homepage": "https://github.com/andreas22/omnipay-fasapay",
+    "homepage": "https://github.com/Addgod/omnipay-dibs-d2",
     "license": "MIT",
     "authors": [
         {
-            "name": "Andreas Christodoulou",
-            "email": "ac@digitzone.net"
+            "name": "Jesper Kold-Hansen",
+            "email": "jkoldhansen@gmail.com"
         }
     ],
     "autoload": {
-        "psr-4": { "Omnipay\\Fasapay\\" : "src/" }
+        "psr-4": { "Omnipay\\DibsD2\\" : "src/" }
     },
     "require": {
         "omnipay/common": "~2.0"

@@ -1,24 +1,36 @@
 <?php
 
-namespace Omnipay\Fasapay\Message;
+namespace Omnipay\DibsD2\Message;
 
 use Omnipay\Common\Message\AbstractRequest;
-use Omnipay\Fasapay\Helpers\Security;
+use Omnipay\DibsD2\Helpers\Security;
 
 /**
  * Dummy Authorize Request
  */
 class CompletePurchaseRequest extends AbstractRequest
 {
-    public function setSecret($value)
+    public function setKey1($value)
     {
-        return $this->setParameter('secret', $value);
+        return $this->setParameter('key1', $value);
     }
 
-    public function getSecret()
+    public function getKey1()
     {
-        return $this->getParameter('secret');
+        return $this->getParameter('key1');
     }
+
+    public function setKey2($value)
+    {
+        return $this->setParameter('key2', $value);
+    }
+
+    public function getKey2()
+    {
+        return $this->getParameter('key2');
+    }
+
+
     public function getData()
     {
         return $this->httpRequest->request->all();
@@ -43,30 +55,32 @@ class CompletePurchaseRequest extends AbstractRequest
      */
     public function validateHash(array $data)
     {
-        $fpHash = isset($data['fp_hash']) ? $data['fp_hash'] : null;
+        $fpHash = isset($data['authkey']) ? $data['authkey'] : null;
 
         if (empty($fpHash)) {
             return true;
         }
 
         $parameters = $this->getParameters();
-        $secret = isset($parameters['secret']) ? $parameters['secret'] : '';
 
-        if (empty($secret)) {
-            throw new \Exception("Secret key is required!");
+        $key1 = isset($parameters['key1']) ? $parameters['key1'] : '';
+        $key2 = isset($parameters['key2']) ? $parameters['key2'] : '';
+
+        if (empty($key1 || $key2)) {
+            throw new \Exception("Invalid or no keys set.!");
         }
 
-        $response = array(
-            $data['fp_paidto'],
-            $data['fp_paidby'],
-            $data['fp_store'],
-            $data['fp_amnt'],
-            $data['fp_batchnumber'],
-            $data['fp_currency'],
-            $secret
-        );
+//        $response = array(
+//            $data['fp_paidto'],
+//            $data['fp_paidby'],
+//            $data['fp_store'],
+//            $data['fp_amnt'],
+//            $data['fp_batchnumber'],
+//            $data['fp_currency'],
+//            $secret
+//        );
 
-        $hash = Security::getHash($response);
+        $hash = Security::getHash($key2, $key1, $response);
 
         if (strcmp($fpHash, $hash) !== 0) {
             throw new \Exception("Invalid response! Secret key is wrong!");
