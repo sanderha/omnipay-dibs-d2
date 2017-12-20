@@ -7,7 +7,7 @@ use Omnipay\Common\Message\AbstractResponse;
 /**
  * Dummy Response
  */
-class CompletePurchaseResponse extends AbstractResponse
+class CompleteResponse extends AbstractResponse
 {
     public function isSuccessful()
     {
@@ -16,6 +16,6 @@ class CompletePurchaseResponse extends AbstractResponse
 
     public function getTransactionReference()
     {
-        return isset($this->data['orderid']) ? $this->data['orderid'] : null;
+        return isset($this->data['transact']) ? $this->data['transact'] : null;
     }
 }

@@ -5,12 +5,8 @@ namespace Omnipay\DibsD2\Message;
 use Omnipay\Common\Message\AbstractResponse;
 use Omnipay\Common\Message\RedirectResponseInterface;
 
-/**
- * Dummy Response
- */
-class PurchaseResponse extends AbstractResponse implements RedirectResponseInterface
+class RedirectResponse extends AbstractResponse implements RedirectResponseInterface
 {
-    protected $endpoint;
 
     public function __construct($purchaseRequest, $data, $endpoint)
     {
