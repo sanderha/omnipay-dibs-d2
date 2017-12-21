@@ -8,6 +8,7 @@ use Omnipay\DibsD2\Message\PurchaseRequest;
 use Omnipay\DibsD2\Message\CompleteRequest;
 use Omnipay\DibsD2\Message\AuthorizeRequest;
 use Omnipay\DibsD2\Message\RefundRequest;
+use Omnipay\DibsD2\Message\ReAuthorizeRequest;
 use Omnipay\DibsD2\Message\VoidRequest;
 
 /**
@@ -64,6 +65,15 @@ class Gateway extends AbstractGateway
     public function authorize(array $options = array())
     {
         return $this->createRequest(AuthorizeRequest::class, $options);
+    }
+
+    /**
+     * @param array $options
+     * @return ReAuthorizeRequest
+     */
+    public function reAuthorize(array $options = array())
+    {
+        return $this->createRequest(ReAuthorizeRequest::class, $options);
     }
 
     /**
