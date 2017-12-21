@@ -32,6 +32,9 @@ class Gateway extends AbstractGateway
             'key1' => '',
             'key2' => '',
             'merchantId' => '',
+            'lang' => 'en',
+            'password' => '',
+            'username' => '',
             'testMode' => false,
         );
     }

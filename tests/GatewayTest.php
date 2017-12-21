@@ -2,7 +2,15 @@
 
 namespace Omnipay\DibsD2;
 
-use Omnipay\DibsD2\Helpers\Security;
+use Omnipay\Common\CreditCard;
+use Omnipay\DibsD2\Message\AuthorizeRequest;
+use Omnipay\DibsD2\Message\CaptureRequest;
+use Omnipay\DibsD2\Message\CompleteRequest;
+use Omnipay\DibsD2\Message\PurchaseRequest;
+use Omnipay\DibsD2\Message\RedirectResponse;
+use Omnipay\DibsD2\Message\RefundRequest;
+use Omnipay\DibsD2\Message\VoidRequest;
+use Omnipay\DibsD2\Message\PostResponse;
 use Omnipay\Tests\GatewayTestCase;
 
 /**
@@ -17,203 +25,258 @@ class GatewayTest extends GatewayTestCase
      */
     protected $gateway;
 
+    /**
+     * @var CreditCard
+     */
+    protected $card;
+
     public function setUp()
     {
         parent::setUp();
 
         $this->gateway = new Gateway($this->getHttpClient(), $this->getHttpRequest());
+
+        $this->gateway->setLang('da');
+        $this->gateway->setMerchantId('123');
+        $this->gateway->setTestMode(true);
+        $this->gateway->setKey1('key1');
+        $this->gateway->setKey2('key2');
+        $this->gateway->setPassword('password');
+        $this->gateway->setUsername('username');
+
+        $card = new CreditCard($this->getValidCard());
+        $card->setBillingAddress1('Wall street');
+        $card->setBillingAddress2('Wall street 2');
+        $card->setBillingCity('San Luis Obispo');
+        $card->setBillingCountry('US');
+        $card->setBillingPostcode('93401');
+        $card->setBillingPhone('1234567');
+        $card->setBillingState('CA');
+        $card->setShippingAddress1('Shipping Wall street');
+        $card->setShippingAddress2('Shipping Wall street 2');
+        $card->setShippingCity('San Luis Obispo');
+        $card->setShippingCountry('US');
+        $card->setShippingPostcode('93401');
+        $card->setShippingPhone('1234567');
+        $card->setShippingState('CA');
+        $card->setCompany('Test Business name');
+        $card->setEmail('test@example.com');
+        $this->card = $card;
     }
 
-    public function testPurchaseGetterSetters()
+    public function testGatewayGetterSetters()
     {
-        $request = $this->gateway->purchase();
-
-        $request->setTestMode(true);
-        $request->setAccepturl('http://test.tst');
-        $request->setCallbackurl('http://test.tst');
-        $request->setCurrency('DKK');
-        $request->setMerchant('123123');
-        $request->setOrderid('1');
-        $request->setBillingAddress('Road of roads');
-        $request->setBillingAddress2('More roads of roads');
-        $request->setBillingFirstName('First');
-        $request->setBillingLastName('Last');
-        $request->setBillingPostalCode('9000');
-        $request->setCardholder_name('Card Holder');
-        $request->setCardholder_address1('card holder address');
-        $request->setCardholder_zipcode('8000');
-
-        $this->assertTrue($request->getTestMode());
-        $this->assertEquals($request->getAccepturl(), 'http://test.tst');
-
-
+        $this->assertSame('da', $this->gateway->getLang());
+        $this->assertSame('123', $this->gateway->getMerchantId());
+        $this->assertSame('key1', $this->gateway->getKey1());
+        $this->assertSame('key2', $this->gateway->getKey2());
+        $this->assertSame('password', $this->gateway->getPassword());
+        $this->assertSame('username', $this->gateway->getUsername());
     }
 
-    public function testPurchaseSimpleMode()
+    public function testPurchaseWithMd5Check()
     {
-        $purchaseOptions = array(
-            'accepturl' => 'http://test.tst',
-            'amount' => 10000,
-            'callbackurl' => 'http://test.tst',
-            'currency' => 752,
-            'merchant' => '1245748',
-            'orderid' => '1',
-        );
+        $params = [
+            'amount'        => 100.00,
+            'currency'      => 'DKK',
+            'card'          => $this->card,
+            'accepturl'     => 'http:://test.test',
+            'callbackurl'   => 'http:://test.test',
+        ];
+        $response = $this->gateway->purchase($params);
+        $this->assertInstanceOf(PurchaseRequest::class, $response);
+        $this->assertArrayHasKey('capturenow', $response->getData());
 
-        $request = $this->gateway->purchase($purchaseOptions);
+        $request = $response->sendData($response->getData());
+        $this->assertInstanceOf(RedirectResponse::class, $request);
+
+        $this->assertSame('POST', $request->getRedirectMethod());
+        $this->assertSame($response->endpoint, $request->getRedirectUrl());
+        $this->assertTrue($request->isRedirect());
+        $this->assertFalse($request->isSuccessful());
+        $this->assertSame($response->getData(), $request->getRedirectData());
+    }
+
+    public function testPurchaseWithoutMd5Check()
+    {
+        $this->gateway->setKey1(null);
+        $params = [
+            'amount'        => 100.00,
+            'currency'      => 'DKK',
+            'accepturl'     => 'http:://test.test',
+            'callbackurl'   => 'http:://test.test',
+        ];
+        $response = $this->gateway->purchase($params);
+        $this->assertInstanceOf(PurchaseRequest::class, $response);
+        $this->assertArrayHasKey('capturenow', $response->getData());
+        $this->assertArrayNotHasKey('md5key', $response->getData());
+    }
+
+    public function testCompletePurchase()
+    {
+        $this->getHttpRequest()->request->replace(array(
+            'transact'  => '250525',
+            'amount'    => 100.00,
+            'currency'  => '208',
+            'authkey'   => '4bf548305937044d73d30b952cfcb22e',
+        ));
+        $request = $this->gateway->completePurchase();
+        $this->assertInstanceOf(CompleteRequest::class, $request);
+
         $response = $request->send();
-        $redirectUrl = $response->getRedirectUrl();
-        $redirectData = $response->getRedirectData();
-
-        //Response validation
-        $this->assertEquals('POST', $response->getRedirectMethod());
-        $this->assertTrue(!empty($redirectUrl));
-        $this->assertTrue($response->isRedirect());
-        $this->assertTrue(!$response->isSuccessful());
-        $this->assertTrue(!empty($redirectData));
+        $this->assertTrue($response->isSuccessful());
+        $this->assertSame('250525', $response->getTransactionReference());
     }
 
-    public function testPurchaseAdvanceMode()
+    public function testCompletePurchaseWithNoMd5()
     {
-        $purchaseOptions = array(
-            'accepturl' => 'http://test.tst',
-            'amount' => 10000,
-            'callbackurl' => 'http://test.tst',
-            'currency' => 752,
-            'merchant' => '1245748',
-            'orderid' => '1',
-        );
+        $this->gateway->setKey1(null);
+        $this->getHttpRequest()->request->replace(array(
+            'transact'  => '250525',
+            'amount'    => 100.00,
+            'currency'  => '208'
+        ));
+        $request = $this->gateway->completePurchase();
+        $this->assertInstanceOf(CompleteRequest::class, $request);
 
-        $request = $this->gateway->purchase($purchaseOptions);
+        $response = $request->send();
+        $this->assertSame('250525', $response->getTransactionReference());
+    }
+
+    public function testCompletePurchaseWithMd5Failure()
+    {
+        $this->getHttpRequest()->request->replace(array(
+            'transact'  => '250525',
+            'amount'    => 100.00,
+            'currency'  => '208',
+            'authkey'   => 'fail',
+        ));
+        $request = $this->gateway->completePurchase();
+        $this->assertInstanceOf(CompleteRequest::class, $request);
+
+        $this->setExpectedException(\UnexpectedValueException::class);
+        $request->send();
+    }
+
+    public function testAuthorize()
+    {
+        $params = [
+            'amount'        => 100.00,
+            'currency'      => 'DKK',
+            'card'          => $this->card,
+            'accepturl'     => 'http:://test.test',
+            'callbackurl'   => 'http:://test.test',
+        ];
+        $response = $this->gateway->authorize($params);
+        $this->assertInstanceOf(AuthorizeRequest::class, $response);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response->send());
+    }
+
+    public function testCompleteAuthorize()
+    {
+        $response = $this->gateway->completeAuthorize();
+        $this->assertInstanceOf(CompleteRequest::class, $response);
+    }
+
+    public function testCapture()
+    {
+        $params = [
+            'amount'        => 100.00,
+            'transact'      => '250525',
+            'orderid'       => 6,
+        ];
+        $request = $this->gateway->capture($params);
+        $this->assertInstanceOf(CaptureRequest::class, $request);
+
+        $this->setMockHttpResponse('PostResponseAccepted.txt');
         $response = $request->send();
 
-        //Response validation
-        $this->assertTrue($response->isRedirect());
-        $this->assertTrue(!$response->isSuccessful());
+        $this->assertTrue($response->isSuccessful());
     }
 
-    public function testCompletePurchaseSimpleModeSuccess()
+    public function testCaptureFailed()
     {
-        $responseParams = array(
-            'acquirer' => 'VISA',
-            'agreement' => '1245748',
-            'amount' => 10000,
-            'approvalcode' => '',
-            'authkey' => 'IDR',
-            'cardcountry' => 'DK',
-            'cardexpdate' => '1901',
-            'cardId' => '1e2adf1f2f3643706e829e48a962b1e9',
-            'cardnomask' => 'XXXXXXXXXXXX1234',
-            'cardprefix' => '123456',
-            'checksum' => '831c752681bfc057744155a540f5346f',
-            'currency' => 'DKK',
-            'fee' => '0',
-            'orderid' => '1',
-            'paytype' => 'VISA',
-            'severity' => '1',
-            'statuscode' => '2',
-            'suspect' => 'false',
-            'threeDstatus' => '0',
-            'transact' => '123456',
-        );
-        $request = $this->gateway->completePurchase($responseParams);
-        $response = $request->sendData($responseParams);
+        $params = [
+            'amount'        => 100.00,
+            'transact'      => '250525',
+            'orderid'       => 6,
+        ];
+        $request = $this->gateway->capture($params);
+        $this->assertInstanceOf(CaptureRequest::class, $request);
 
-        //Response validation
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame($response->getTransactionReference(), $responseParams['orderid']);
-        $this->assertTrue(sizeof($request->getData()) == 0);
+        $this->setMockHttpResponse('PostResponseFailed.txt');
+        $response = $request->send();
+
+        $this->assertFalse($response->isSuccessful());
     }
 
-    public function testCompletePurchaseAdvanceModeSuccess()
+    public function provideErrorResponses()
     {
-        $hash = Security::getHash('asdf', 'dsfa', [
-            'merchant'  => '123456',
-            'orderid'   => 1,
-            'currency'  => 'DKK',
-            'amount'    => 10000
-        ]);
-
-        $responseParams = array(
-            'acquirer' => 'VISA',
-            'agreement' => '1245748',
-            'amount' => 10000,
-            'approvalcode' => '',
-            'authkey' => $hash,
-            'cardcountry' => 'DK',
-            'cardexpdate' => '1901',
-            'cardId' => '1e2adf1f2f3643706e829e48a962b1e9',
-            'cardnomask' => 'XXXXXXXXXXXX1234',
-            'cardprefix' => '123456',
-            'checksum' => '831c752681bfc057744155a540f5346f',
-            'currency' => 'DKK',
-            'fee' => '0',
-            'orderid' => '1',
-            'paytype' => 'VISA',
-            'severity' => '1',
-            'statuscode' => '2',
-            'suspect' => 'false',
-            'threeDstatus' => '0',
-            'transact' => '123456',
-        );
-
-        $request = $this->gateway->completePurchase($responseParams);
-        $this->gateway->setKey1('asdf');
-        $this->gateway->setKey2('dsfa');
-        $response = $request->sendData($responseParams);
-
-        //Response validation
-        $this->assertTrue($response->isSuccessful());
-        $this->assertSame($response->getTransactionReference(), $responseParams['orderid']);
-        var_dump($response);die;
-
-        // $this->assertSame($hash, $request->getSecret());
+        return [
+            ['1', 'No response from acquirer'],
+            ['2', 'Timeout'],
+            ['3', 'Credit card expired'],
+            ['4', 'Rejected by acquirer'],
+            ['5', 'Authorisation older than 7 days'],
+            ['6', 'Transaction status on the DIBS server does not allow function'],
+            ['7', 'Amount too high'],
+            ['8', 'Error in the parameters sent to the DIBS server. An additional parameter called "message" is returned, with a value that may help identifying the error'],
+            ['9', 'Order number (orderid) does not correspond to the authorisation order number'],
+            ['10', 'Re-authorisation of the transaction was rejected'],
+            ['11', 'Not able to communicate with the acquier'],
+            ['12', 'Confirm request error'],
+            ['14', 'Capture is called for a transaction which is pending for batch - i.e. capture was already called'],
+            ['15', 'Capture or refund was blocked by DIBS'],
+            ['100', 'Unknown error'],
+        ];
     }
 
     /**
-     * @expectedException        \Exception
-     * @expectedExceptionMessage Invalid response
+     * @dataProvider provideErrorResponses
      */
-    public function CompletePurchaseAdvanceModeInvalidHash()
+    public function testPostResponseErrorCodes($errorCode, $responseText)
     {
-        $responseParams = array(
-            'fp_paidto' => 'FP000001',
-            'fp_paidby' => 'FP000002',
-            'fp_amnt' => 1000,
-            'fp_fee_amnt' => 1000,
-            'fp_currency' => 'IDR',
-            'fp_batchnumber' => 'DDDADS234234',
-            'fp_store' => 'my store',
-            'fp_timestamp' => date('Y-m-d H:i:s'),
-            'fp_merchant_ref' => '1311059195',
-            'fp_hash' => 'xxxx'
-        );
-
-        $request = $this->gateway->completePurchase($responseParams);
-        $request->setSecret(5000);
-        $request->sendData($responseParams);
+        // This is just a dummy request.
+        $request = $this->gateway->capture();
+        $output = [
+            'status'    => 'FAILED',
+            'reason'    => $errorCode
+        ];
+        $postResponse = new PostResponse($request, $output);
+        $this->assertSame($responseText, $postResponse->getError());
     }
 
-    /**
-     * @expectedException        \Exception
-     * @expectedExceptionMessage Secret key is required!
-     */
-    public function CompletePurchaseAdvanceModeMissingSecret()
+    public function testVoid()
     {
-        $responseParams = array(
-            'fp_paidto' => 'FP000001',
-            'fp_paidby' => 'FP000002',
-            'fp_amnt' => 1000,
-            'fp_fee_amnt' => 1000,
-            'fp_currency' => 'IDR',
-            'fp_batchnumber' => 'DDDADS234234',
-            'fp_store' => 'my store',
-            'fp_timestamp' => date('Y-m-d H:i:s'),
-            'fp_merchant_ref' => '1311059195',
-            'fp_hash' => 'xxxx'
-        );
+        $params = [
+            'amount'        => 100.00,
+            'transact'      => '250525',
+            'orderid'       => 6,
+        ];
+        $request = $this->gateway->void($params);
+        $this->assertInstanceOf(VoidRequest::class, $request);
 
-        $request = $this->gateway->completePurchase($responseParams);
-        $request->sendData($responseParams);
+        $this->setMockHttpResponse('PostResponseAccepted.txt');
+        $response = $request->send();
+
+        $this->assertTrue($response->isSuccessful());
     }
+
+    public function testRefund()
+    {
+        $params = [
+            'amount'        => 100.00,
+            'transact'      => '250525',
+            'orderid'       => 6,
+        ];
+        $request = $this->gateway->refund($params);
+        $this->assertInstanceOf(RefundRequest::class, $request);
+
+        $this->setMockHttpResponse('PostResponseAccepted.txt');
+        $response = $request->send();
+
+        $this->assertTrue($response->isSuccessful());
+    }
+
 }

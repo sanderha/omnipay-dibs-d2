@@ -21,7 +21,7 @@ abstract class GeneralRequest extends AbstractRequest
             'accepturl'             => $this->getReturnUrl(),
             'amount'                => $this->getAmountInteger(),
             'callbackurl'           => $this->getCallbackUrl(),
-            'currency'              => $this->getCurrency(),
+            'currency'              => $this->getCurrencyNumeric(),
             'merchant'              => $this->getMerchantId(),
             'orderid'               => $this->getOrderId(),
             'md5key'                => $this->getMd5Key(),
@@ -29,7 +29,7 @@ abstract class GeneralRequest extends AbstractRequest
             'test'                  => $this->getTestMode(),
         ];
 
-        if ($this->getCardReference()) {
+        if ($card) {
             $data = array_merge($data, [
                 'billingAddress'        => $card->getBillingAddress1(),
                 'billingAddress2'       => $card->getBillingAddress2(),
@@ -42,16 +42,6 @@ abstract class GeneralRequest extends AbstractRequest
         }
 
         return array_filter($data);
-    }
-
-    public function setCurrency($value)
-    {
-        if (preg_match('/^[0-9]{3}$/',$value)) {
-            return parent::setCurrency($value);
-        } else {
-            throw new \UnexpectedValueException('Currency must be 3 digits, representing a currency. See https://en.wikipedia.org/wiki/ISO_4217');
-        }
-
     }
 
     public function setLang($value)

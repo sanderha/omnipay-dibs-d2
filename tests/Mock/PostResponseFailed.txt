@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK
+cache-control: Private, no-cache
+content-type: text/html; charset=iso-8859-1
+Date: Thu, 31 Oct 2013 20:50:54 GMT
+expires: -1
+mime-version: 1.0
+pragma: no-cache
+Server: 10328:d:8000
+strict-transport-security: max-age=15768000; includeSubDomains
+Content-Length: 544
+Connection: keep-alive
+
+status=FAILED&reason=1
+

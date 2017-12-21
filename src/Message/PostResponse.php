@@ -63,7 +63,8 @@ class PostResponse extends AbstractResponse
             case 15 :
                 return 'Capture or refund was blocked by DIBS';
                 break;
+            default:
+                return 'Unknown error';
         }
-
     }
 }

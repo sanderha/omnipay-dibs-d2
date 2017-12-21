@@ -14,7 +14,7 @@ class RefundRequest extends GeneralRequest
             'merchant'      => $this->getMerchantId(),
             'transact'      => $this->getTransactionId(),
             'amount'        => $this->getAmountInteger(),
-            'currency'      => $this->getCurrency(),
+            'currency'      => $this->getCurrencyNumeric(),
             'orderid'       => $this->getOrderId(),
             'md5key'        => $this->getMd5Key(),
             'textreply'     => "yes",
