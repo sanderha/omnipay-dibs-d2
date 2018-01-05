@@ -1,5 +1,5 @@
 {
-    "name": "Addgod/omnipay-dibs-d2",
+    "name": "addgod/omnipay-dibs-d2",
     "type": "library",
     "description": "Dibs D2 driver for the Omnipay payment processing library",
     "keywords": [

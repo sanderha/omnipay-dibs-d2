@@ -7,6 +7,7 @@ use Omnipay\DibsD2\Message\AuthorizeRequest;
 use Omnipay\DibsD2\Message\CaptureRequest;
 use Omnipay\DibsD2\Message\CompleteRequest;
 use Omnipay\DibsD2\Message\PurchaseRequest;
+use Omnipay\DibsD2\Message\ReAuthorizeRequest;
 use Omnipay\DibsD2\Message\RedirectResponse;
 use Omnipay\DibsD2\Message\RefundRequest;
 use Omnipay\DibsD2\Message\VoidRequest;
@@ -272,6 +273,22 @@ class GatewayTest extends GatewayTestCase
         ];
         $request = $this->gateway->refund($params);
         $this->assertInstanceOf(RefundRequest::class, $request);
+
+        $this->setMockHttpResponse('PostResponseAccepted.txt');
+        $response = $request->send();
+
+        $this->assertTrue($response->isSuccessful());
+    }
+
+    public function testReAuthorize()
+    {
+        $params = [
+            'amount'        => 100.00,
+            'transact'      => '250525',
+            'orderid'       => 6,
+        ];
+        $request = $this->gateway->reAuthorize($params);
+        $this->assertInstanceOf(ReAuthorizeRequest::class, $request);
 
         $this->setMockHttpResponse('PostResponseAccepted.txt');
         $response = $request->send();
