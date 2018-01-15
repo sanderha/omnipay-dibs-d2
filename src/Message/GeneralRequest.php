@@ -21,11 +21,13 @@ abstract class GeneralRequest extends AbstractRequest
             'accepturl'             => $this->getReturnUrl(),
             'amount'                => $this->getAmountInteger(),
             'callbackurl'           => $this->getCallbackUrl(),
+            'cancelurl'             => $this->getCancelUrl(),
             'currency'              => $this->getCurrencyNumeric(),
             'merchant'              => $this->getMerchantId(),
             'orderid'               => $this->getOrderId(),
             'md5key'                => $this->getMd5Key(),
             'lang'                  => $this->getLang(),
+            'payType'               => $this->getPayType(),
             'test'                  => $this->getTestMode(),
         ];
 
@@ -96,7 +98,7 @@ abstract class GeneralRequest extends AbstractRequest
         $parameter_string = '';
         $parameter_string .= 'merchant=' . $this->getMerchantId();
         $parameter_string .= '&orderid=' . $this->getOrderId();
-    $parameter_string .= '&currency=' . $this->getCurrencyNumeric();
+        $parameter_string .= '&currency=' . $this->getCurrencyNumeric();
         $parameter_string .= '&amount=' . $this->getAmountInteger();
 
         return md5($key2 . md5($key1 . $parameter_string) );
@@ -142,4 +144,13 @@ abstract class GeneralRequest extends AbstractRequest
         return $this->getParameter('username');
     }
 
+    public function setPayType($value)
+    {
+        return $this->setParameter('payType', $value);
+    }
+
+    public function getPayType()
+    {
+        return $this->getParameter('payType');
+    }
 }

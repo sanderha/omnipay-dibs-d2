@@ -18,6 +18,11 @@ class PostResponse extends AbstractResponse
         return $this->data['status'] === 'ACCEPTED';
     }
 
+    public function getTransactionReference()
+    {
+        return isset($this->data['transact']) ? $this->data['transact'] : null;
+    }
+
     public function getError()
     {
         switch ($this->data['reason']) {

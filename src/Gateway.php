@@ -69,20 +69,20 @@ class Gateway extends AbstractGateway
 
     /**
      * @param array $options
-     * @return ReAuthorizeRequest
-     */
-    public function reAuthorize(array $options = array())
-    {
-        return $this->createRequest(ReAuthorizeRequest::class, $options);
-    }
-
-    /**
-     * @param array $options
      * @return CompleteRequest
      */
     public function completeAuthorize(array $options = array())
     {
         return $this->createRequest(CompleteRequest::class, $options);
+    }
+
+    /**
+     * @param array $options
+     * @return ReAuthorizeRequest
+     */
+    public function reAuthorize(array $options = array())
+    {
+        return $this->createRequest(ReAuthorizeRequest::class, $options);
     }
 
     /**
@@ -171,5 +171,15 @@ class Gateway extends AbstractGateway
     public function getUsername()
     {
         return $this->getParameter('username');
+    }
+
+    public function setPayType($value)
+    {
+        return $this->setParameter('payType', $value);
+    }
+
+    public function getPayType()
+    {
+        return $this->getParameter('payType');
     }
 }
