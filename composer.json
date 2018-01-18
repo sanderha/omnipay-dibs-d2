@@ -4,7 +4,7 @@
     "description": "Dibs D2 driver for the Omnipay payment processing library",
     "keywords": [
         "dibs",
-        "dubs d2",
+        "dibs d2",
         "gateway",
         "merchant",
         "omnipay",
@@ -24,14 +24,9 @@
         "psr-4": { "Omnipay\\DibsD2\\" : "src/" }
     },
     "require": {
-        "omnipay/common": "~2.0"
+        "omnipay/common": "dev-master"
     },
     "require-dev": {
-        "omnipay/tests": "~2.0"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
+        "omnipay/tests": "dev-master"
     }
 }

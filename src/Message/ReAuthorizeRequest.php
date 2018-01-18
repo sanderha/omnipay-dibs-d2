@@ -8,8 +8,6 @@
 
 namespace Omnipay\DibsD2\Message;
 
-use Guzzle\Http\Message\RequestInterface;
-
 class ReAuthorizeRequest extends GeneralRequest
 {
     public $endpoint = 'https://payment.architrade.com/cgi-bin/reauth.cgi';
@@ -27,7 +25,7 @@ class ReAuthorizeRequest extends GeneralRequest
 
     public function sendData($data)
     {
-        $http_response = $this->httpClient->createRequest(RequestInterface::POST, $this->endpoint, [], $data)->send();
+        $http_response = $this->httpClient->send('POST', $this->endpoint, [], $data);
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }

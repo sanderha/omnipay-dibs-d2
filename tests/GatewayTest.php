@@ -116,10 +116,11 @@ class GatewayTest extends GatewayTestCase
     public function testCompletePurchase()
     {
         $this->getHttpRequest()->request->replace(array(
-            'transact'  => '250525',
-            'amount'    => 100.00,
-            'currency'  => '208',
-            'authkey'   => '4bf548305937044d73d30b952cfcb22e',
+            'transact'      => '250525',
+            'amount'        => 100.00,
+            'currency'      => '208',
+            'authkey'       => '4bf548305937044d73d30b952cfcb22e',
+            'statuscode'    => 5,
         ));
         $request = $this->gateway->completePurchase();
         $this->assertInstanceOf(CompleteRequest::class, $request);
