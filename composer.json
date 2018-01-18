@@ -12,6 +12,7 @@
         "payment",
         "transfer"
     ],
+    "minimum-stability" : "dev",
     "homepage": "https://github.com/Addgod/omnipay-dibs-d2",
     "license": "MIT",
     "authors": [
@@ -24,7 +25,7 @@
         "psr-4": { "Omnipay\\DibsD2\\" : "src/" }
     },
     "require": {
-        "omnipay/common": "dev-master"
+        "omnipay/omnipay": "dev-master"
     },
     "require-dev": {
         "omnipay/tests": "dev-master"
