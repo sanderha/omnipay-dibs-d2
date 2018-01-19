@@ -41,12 +41,12 @@ class CompleteResponse extends AbstractResponse
 
     public function isCaptured()
     {
-        return $this->data['statuscode'] === 5;
+        return $this->data['statuscode'] == 5;
     }
 
     public function isAuthorized()
     {
-        return $this->data['statuscode'] === 2;
+        return $this->data['statuscode'] == 2;
     }
 
     public function getTransactionReference()

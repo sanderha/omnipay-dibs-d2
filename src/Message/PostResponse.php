@@ -15,7 +15,7 @@ class PostResponse extends AbstractResponse
 {
     public function isSuccessful()
     {
-        return $this->data['status'] === 'ACCEPTED';
+        return isset($this->data['status']) && $this->data['status'] === 'ACCEPTED';
     }
 
     public function getTransactionReference()
