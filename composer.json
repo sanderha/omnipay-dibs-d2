@@ -25,9 +25,9 @@
         "psr-4": { "Omnipay\\DibsD2\\" : "src/" }
     },
     "require": {
-        "omnipay/omnipay": "dev-master"
+        "omnipay/common": "~3.0"
     },
     "require-dev": {
-        "omnipay/tests": "dev-master"
+        "omnipay/tests": "~3.0",
     }
 }
