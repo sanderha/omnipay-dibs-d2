@@ -25,7 +25,7 @@ class ReAuthorizeRequest extends GeneralRequest
 
     public function sendData($data)
     {
-        $http_response = $this->httpClient->send('POST', $this->endpoint, [], $data);
+        $http_response = $this->httpClient->post($this->endpoint, ['Content-type' => 'text/plain'], http_build_query($data));
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }

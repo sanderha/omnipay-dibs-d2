@@ -24,7 +24,7 @@ class RefundRequest extends GeneralRequest
     public function sendData($data)
     {
         $endpoint = sprintf($this->endpoint, $this->getUsername(), $this->getPassword());
-        $http_response = $this->httpClient->send('POST', $endpoint, [], $data);
+        $http_response = $this->httpClient->post($endpoint, ['Content-type' => 'text/plain'], http_build_query($data));
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }
