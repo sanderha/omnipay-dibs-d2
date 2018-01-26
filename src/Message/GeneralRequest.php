@@ -20,7 +20,7 @@ abstract class GeneralRequest extends AbstractRequest
         $data = [
             'accepturl'             => $this->getReturnUrl(),
             'amount'                => $this->getAmountInteger(),
-            'callbackurl'           => $this->getCallbackUrl(),
+            'callbackurl'           => $this->getNotifyUrl(),
             'cancelurl'             => $this->getCancelUrl(),
             'currency'              => $this->getCurrencyNumeric(),
             'merchant'              => $this->getMerchantId(),
@@ -54,16 +54,6 @@ abstract class GeneralRequest extends AbstractRequest
     public function getLang()
     {
         return $this->getParameter('lang');
-    }
-
-    public function setCallbackUrl($value)
-    {
-        return $this->setParameter('callbackUrl', $value);
-    }
-
-    public function getCallbackUrl()
-    {
-        return $this->getParameter('callbackUrl');
     }
 
     public function setOrderId($value)

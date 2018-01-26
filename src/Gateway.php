@@ -112,6 +112,15 @@ class Gateway extends AbstractGateway
         return $this->createRequest(RefundRequest::class, $options);
     }
 
+    /**
+     * @param array $options
+     * @return RefundRequest
+     */
+    public function acceptNotification(array $options = array())
+    {
+        return $this->createRequest(CompleteRequest::class, $options);
+    }
+
     // Gateway getters and setters
     public function setKey1($value)
     {

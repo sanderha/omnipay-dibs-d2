@@ -81,8 +81,8 @@ class GatewayTest extends GatewayTestCase
             'amount'        => 100.00,
             'currency'      => 'DKK',
             'card'          => $this->card,
-            'accepturl'     => 'http:://test.test',
-            'callbackurl'   => 'http:://test.test',
+            'returnUrl'     => 'http:://test.test',
+            'notifyUrl'   => 'http:://test.test',
         ];
         $response = $this->gateway->purchase($params);
         $this->assertInstanceOf(PurchaseRequest::class, $response);
@@ -104,8 +104,8 @@ class GatewayTest extends GatewayTestCase
         $params = [
             'amount'        => 100.00,
             'currency'      => 'DKK',
-            'accepturl'     => 'http:://test.test',
-            'callbackurl'   => 'http:://test.test',
+            'returnUrl'     => 'http:://test.test',
+            'notifyUrl'   => 'http:://test.test',
         ];
         $response = $this->gateway->purchase($params);
         $this->assertInstanceOf(PurchaseRequest::class, $response);
@@ -166,8 +166,8 @@ class GatewayTest extends GatewayTestCase
             'amount'        => 100.00,
             'currency'      => 'DKK',
             'card'          => $this->card,
-            'accepturl'     => 'http:://test.test',
-            'callbackurl'   => 'http:://test.test',
+            'returnUrl'     => 'http:://test.test',
+            'notifyUrl'   => 'http:://test.test',
         ];
         $response = $this->gateway->authorize($params);
         $this->assertInstanceOf(AuthorizeRequest::class, $response);
@@ -246,7 +246,7 @@ class GatewayTest extends GatewayTestCase
             'reason'    => $errorCode
         ];
         $postResponse = new PostResponse($request, $output);
-        $this->assertSame($responseText, $postResponse->getError());
+        $this->assertSame($responseText, $postResponse->getCode());
     }
 
     public function testVoid()
@@ -296,5 +296,4 @@ class GatewayTest extends GatewayTestCase
 
         $this->assertTrue($response->isSuccessful());
     }
-
 }

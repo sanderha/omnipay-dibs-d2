@@ -39,28 +39,23 @@ class CompleteResponse extends AbstractResponse
         return in_array($this->data['statuscode'], [2,5,7,11]);
     }
 
-    public function isCaptured()
-    {
-        return $this->data['statuscode'] == 5;
-    }
-
-    public function isAuthorized()
-    {
-        return $this->data['statuscode'] == 2;
-    }
-
     public function getTransactionReference()
     {
-        return isset($this->data['transact']) ? $this->data['transact'] : null;
+        return $this->data['orderid'] ?? null;
     }
 
-    public function getStatus()
+    public function getCode()
     {
-        return isset($this->data['statuscode']) ? $this->statusCodes[$this->data['statuscode']] : null;
+        return $this->data['statuscode'] ?? null;
     }
 
-    public function getOrderId()
+    public function getMessage()
     {
-        return isset($this->data['orderid']) ? $this->data['orderid'] : null;
+        return $this->statusCodes[$this->getCode()] ?? null;
+    }
+
+    public function getTransactionId()
+    {
+        return $this->data['transact'] ?? null;
     }
 }
