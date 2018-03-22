@@ -19,8 +19,8 @@ class VoidRequest extends GeneralRequest
         $data = [
             'merchant'      => $this->getMerchantId(),
             'md5key'        => $this->getMd5Key(),
-            'transact'      => $this->getTransactionId(),
-            'orderid'       => $this->getOrderId(),
+            'transact'      => $this->getTransactionReference(),
+            'orderid'       => $this->getTransactionId(),
             'textreply'     => "yes",
         ];
 
