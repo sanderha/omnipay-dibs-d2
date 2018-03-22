@@ -12,10 +12,10 @@ class RefundRequest extends GeneralRequest
     {
         $data = [
             'merchant'      => $this->getMerchantId(),
-            'transact'      => $this->getTransactionId(),
+            'transact'      => $this->getTransactionReference(),
             'amount'        => $this->getAmountInteger(),
             'currency'      => $this->getCurrencyNumeric(),
-            'orderid'       => $this->getOrderId(),
+            'orderid'       => $this->getTransactionId(),
             'md5key'        => $this->getMd5Key(),
             'textreply'     => "yes",
         ];
