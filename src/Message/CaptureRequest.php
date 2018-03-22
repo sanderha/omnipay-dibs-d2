@@ -13,8 +13,8 @@ class CaptureRequest extends GeneralRequest
         $data = [
             'merchant'      => $this->getMerchantId(),
             'amount'        => $this->getAmountInteger(),
-            'transact'      => $this->getTransactionId(),
-            'orderid'       => $this->getOrderId(),
+            'transact'      => $this->getTransactionReference(),
+            'orderid'       => $this->getTransactionId(),
         ];
 
         return $data;

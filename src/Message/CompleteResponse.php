@@ -59,8 +59,15 @@ class CompleteResponse extends AbstractResponse
         return isset($this->data['statuscode']) ? $this->statusCodes[$this->data['statuscode']] : null;
     }
 
-    public function getOrderId()
+    public function getTransactionId()
     {
         return isset($this->data['orderid']) ? $this->data['orderid'] : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage(){
+        return $this->getStatus();
     }
 }

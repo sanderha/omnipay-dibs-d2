@@ -72,4 +72,14 @@ class PostResponse extends AbstractResponse
                 return 'Unknown error';
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getMessage(){
+        if(isset($this->data['reason'])){
+            return $this->getError();
+        }
+        return 'Status: ' . $this->data['status'];
+    }
 }
