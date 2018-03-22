@@ -24,7 +24,7 @@ abstract class GeneralRequest extends AbstractRequest
             'cancelurl'             => $this->getCancelUrl(),
             'currency'              => $this->getCurrencyNumeric(),
             'merchant'              => $this->getMerchantId(),
-            'orderid'               => $this->getOrderId(),
+            'orderid'               => $this->getTransactionId(),
             'md5key'                => $this->getMd5Key(),
             'lang'                  => $this->getLang(),
             'payType'               => $this->getPayType(),
@@ -97,7 +97,7 @@ abstract class GeneralRequest extends AbstractRequest
 
         $parameter_string = '';
         $parameter_string .= 'merchant=' . $this->getMerchantId();
-        $parameter_string .= '&orderid=' . $this->getOrderId();
+        $parameter_string .= '&orderid=' . $this->getTransactionId();
         $parameter_string .= '&currency=' . $this->getCurrencyNumeric();
         $parameter_string .= '&amount=' . $this->getAmountInteger();
 
