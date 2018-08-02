@@ -15,27 +15,17 @@ class PostResponse extends AbstractResponse
 {
     public function isSuccessful()
     {
-        return isset($this->data['status']) && $this->data['status'] === 'ACCEPTED';
+        return $this->data['status'] === 'ACCEPTED';
     }
 
     public function getTransactionReference()
     {
-        return $this->data['orderid'] ?? null;
+        return isset($this->data['transact']) ? $this->data['transact'] : null;
     }
 
-    public function getTransactionId()
+    public function getError()
     {
-        return $this->data['transact'] ?? null;
-    }
-
-    public function getCode()
-    {
-        return $this->data['reason'] ?? null;
-    }
-
-    public function getMessage()
-    {
-        switch ($this->getCode()) {
+        switch ($this->data['reason']) {
             case 1 :
                 return 'No response from acquirer';
                 break;
@@ -79,7 +69,17 @@ class PostResponse extends AbstractResponse
                 return 'Capture or refund was blocked by DIBS';
                 break;
             default:
-                return $this->data['status'] ?? 'Unknown error';
+                return 'Unknown error';
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage(){
+        if(isset($this->data['reason'])){
+            return $this->getError();
+        }
+        return 'Status: ' . $this->data['status'];
     }
 }

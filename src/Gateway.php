@@ -30,13 +30,14 @@ class Gateway extends AbstractGateway
     public function getDefaultParameters()
     {
         return array(
-            'key1' => '',
-            'key2' => '',
+            'key1'       => '',
+            'key2'       => '',
             'merchantId' => '',
-            'lang' => 'en',
-            'password' => '',
-            'username' => '',
-            'testMode' => false,
+            'lang'       => 'en',
+            'password'   => '',
+            'username'   => '',
+            'decorator'  => '',
+            'testMode'   => false,
         );
     }
 
@@ -112,16 +113,17 @@ class Gateway extends AbstractGateway
         return $this->createRequest(RefundRequest::class, $options);
     }
 
-    /**
-     * @param array $options
-     * @return RefundRequest
-     */
-    public function acceptNotification(array $options = array())
+    // Gateway getters and setters
+    public function setDecorator($value)
     {
-        return $this->createRequest(CompleteRequest::class, $options);
+        return $this->setParameter('decorator', $value);
     }
 
-    // Gateway getters and setters
+    public function getDecorator()
+    {
+        return $this->getParameter("decorator");
+    }
+
     public function setKey1($value)
     {
         return $this->setParameter('key1', $value);

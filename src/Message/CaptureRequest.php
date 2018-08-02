@@ -2,6 +2,8 @@
 
 namespace Omnipay\DibsD2\Message;
 
+use Guzzle\Http\Message\RequestInterface;
+
 class CaptureRequest extends GeneralRequest
 {
     public $endpoint = 'https://payment.architrade.com/cgi-bin/capture.cgi';
@@ -11,8 +13,8 @@ class CaptureRequest extends GeneralRequest
         $data = [
             'merchant'      => $this->getMerchantId(),
             'amount'        => $this->getAmountInteger(),
-            'transact'      => $this->getTransactionId(),
-            'orderid'       => $this->getOrderId(),
+            'transact'      => $this->getTransactionReference(),
+            'orderid'       => $this->getTransactionId(),
         ];
 
         return $data;
@@ -20,7 +22,7 @@ class CaptureRequest extends GeneralRequest
 
     public function sendData($data)
     {
-        $http_response = $this->httpClient->post($this->endpoint, ['Content-type' => 'text/plain'], http_build_query($data));
+        $http_response = $this->httpClient->createRequest(RequestInterface::POST, $this->endpoint, [], $data)->send();
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }

@@ -18,32 +18,46 @@ abstract class GeneralRequest extends AbstractRequest
         $card = $this->getCard();
 
         $data = [
-            'accepturl'             => $this->getReturnUrl(),
-            'amount'                => $this->getAmountInteger(),
-            'callbackurl'           => $this->getNotifyUrl(),
-            'cancelurl'             => $this->getCancelUrl(),
-            'currency'              => $this->getCurrencyNumeric(),
-            'merchant'              => $this->getMerchantId(),
-            'orderid'               => $this->getOrderId(),
-            'md5key'                => $this->getMd5Key(),
-            'lang'                  => $this->getLang(),
-            'payType'               => $this->getPayType(),
-            'test'                  => $this->getTestMode(),
+            'accepturl'   => $this->getReturnUrl(),
+            'amount'      => $this->getAmountInteger(),
+            'callbackurl' => $this->getCallbackUrl(),
+            'cancelurl'   => $this->getCancelUrl(),
+            'currency'    => $this->getCurrencyNumeric(),
+            'merchant'    => $this->getMerchantId(),
+            'orderid'     => $this->getTransactionId(),
+            'md5key'      => $this->getMd5Key(),
+            'lang'        => $this->getLang(),
+            'payType'     => $this->getPayType(),
+            'test'        => $this->getTestMode(),
         ];
+
+        if ($decorator = $this->getDecorator()) {
+            $data['decorator'] = $decorator;
+        }
 
         if ($card) {
             $data = array_merge($data, [
-                'billingAddress'        => $card->getBillingAddress1(),
-                'billingAddress2'       => $card->getBillingAddress2(),
-                'billingFirstName'      => $card->getFirstName(),
-                'billingLastName'       => $card->getLastName(),
-                'billingPostalCode'     => $card->getBillingPostcode(),
-                'billingPostalPlace'    => $card->getBillingCity(),
-                'email'                 => $card->getEmail(),
+                'billingAddress'     => $card->getBillingAddress1(),
+                'billingAddress2'    => $card->getBillingAddress2(),
+                'billingFirstName'   => $card->getFirstName(),
+                'billingLastName'    => $card->getLastName(),
+                'billingPostalCode'  => $card->getBillingPostcode(),
+                'billingPostalPlace' => $card->getBillingCity(),
+                'email'              => $card->getEmail(),
             ]);
         }
 
         return array_filter($data);
+    }
+
+    public function setDecorator($value)
+    {
+        return $this->setParameter('decorator', $value);
+    }
+
+    public function getDecorator()
+    {
+        return $this->getParameter("decorator");
     }
 
     public function setLang($value)
@@ -54,6 +68,16 @@ abstract class GeneralRequest extends AbstractRequest
     public function getLang()
     {
         return $this->getParameter('lang');
+    }
+
+    public function setCallbackUrl($value)
+    {
+        return $this->setParameter('callbackUrl', $value);
+    }
+
+    public function getCallbackUrl()
+    {
+        return $this->getParameter('callbackUrl');
     }
 
     public function setOrderId($value)
@@ -87,11 +111,11 @@ abstract class GeneralRequest extends AbstractRequest
 
         $parameter_string = '';
         $parameter_string .= 'merchant=' . $this->getMerchantId();
-        $parameter_string .= '&orderid=' . $this->getOrderId();
+        $parameter_string .= '&orderid=' . $this->getTransactionId();
         $parameter_string .= '&currency=' . $this->getCurrencyNumeric();
         $parameter_string .= '&amount=' . $this->getAmountInteger();
 
-        return md5($key2 . md5($key1 . $parameter_string) );
+        return md5($key2 . md5($key1 . $parameter_string));
     }
 
     public function setKey1($value)

@@ -8,6 +8,8 @@
 
 namespace Omnipay\DibsD2\Message;
 
+use Guzzle\Http\Message\RequestInterface;
+
 class VoidRequest extends GeneralRequest
 {
     public $endpoint = 'https://%s:%s@payment.architrade.com/cgi-adm/cancel.cgi';
@@ -17,8 +19,8 @@ class VoidRequest extends GeneralRequest
         $data = [
             'merchant'      => $this->getMerchantId(),
             'md5key'        => $this->getMd5Key(),
-            'transact'      => $this->getTransactionId(),
-            'orderid'       => $this->getOrderId(),
+            'transact'      => $this->getTransactionReference(),
+            'orderid'       => $this->getTransactionId(),
             'textreply'     => "yes",
         ];
 
@@ -28,7 +30,7 @@ class VoidRequest extends GeneralRequest
     public function sendData($data)
     {
         $endpoint = sprintf($this->endpoint, $this->getUsername(), $this->getPassword());
-        $http_response = $this->httpClient->post($endpoint, ['Content-type' => 'text/plain'], http_build_query($data));
+        $http_response = $this->httpClient->createRequest(RequestInterface::POST, $endpoint, [], $data)->send();
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }

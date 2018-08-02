@@ -2,6 +2,8 @@
 
 namespace Omnipay\DibsD2\Message;
 
+use Guzzle\Http\Message\RequestInterface;
+
 class RefundRequest extends GeneralRequest
 {
     public $endpoint = 'https://%s:%s@payment.architrade.com/cgi-adm/refund.cgi';
@@ -10,10 +12,10 @@ class RefundRequest extends GeneralRequest
     {
         $data = [
             'merchant'      => $this->getMerchantId(),
-            'transact'      => $this->getTransactionId(),
+            'transact'      => $this->getTransactionReference(),
             'amount'        => $this->getAmountInteger(),
             'currency'      => $this->getCurrencyNumeric(),
-            'orderid'       => $this->getOrderId(),
+            'orderid'       => $this->getTransactionId(),
             'md5key'        => $this->getMd5Key(),
             'textreply'     => "yes",
         ];
@@ -24,7 +26,7 @@ class RefundRequest extends GeneralRequest
     public function sendData($data)
     {
         $endpoint = sprintf($this->endpoint, $this->getUsername(), $this->getPassword());
-        $http_response = $this->httpClient->post($endpoint, ['Content-type' => 'text/plain'], http_build_query($data));
+        $http_response = $this->httpClient->createRequest(RequestInterface::POST, $endpoint, [], $data)->send();
         parse_str($http_response->getBody(true), $output);
         return $this->response = new PostResponse($this, $output);
     }
